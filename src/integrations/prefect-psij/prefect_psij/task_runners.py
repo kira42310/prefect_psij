@@ -106,9 +106,9 @@ from prefect.utilities.importtools import from_qualified_name, to_qualified_name
 # from prefect_psij.client import PrefectPSIJClient
 from datetime import timedelta
 
-import sys
+# import sys
 
-sys.path.append(f'/lvs0/rccs-qhpc/soratouch/workflow/psij_wrapper')
+# sys.path.append(f'/lvs0/rccs-qhpc/soratouch/workflow/psij_wrapper')
 
 import psij_ext
 import psij
@@ -128,14 +128,14 @@ F = TypeVar("F", bound=PrefectFuture[Any])
 R = TypeVar("R")
 
 # For checking parameter
-tmp_file = '/lvs0/rccs-qhpc/soratouch/workflow/tmpfile'
+# tmp_file = '/lvs0/rccs-qhpc/soratouch/workflow/tmpfile'
 
 # class PrefectPSIJFuture(PrefectWrappedFuture[R, distributed.Future]):
 class PrefectPSIJFuture(PrefectWrappedFuture[R, psij.Job]):
 
     def wait(self, timeout: Optional[float] = None ) -> None:
-        with open( tmp_file, 'a' ) as f:
-            f.write( 'wait function\n' )
+        # with open( tmp_file, 'a' ) as f:
+        #     f.write( 'wait function\n' )
         try:
             # result = self._wrapped_future.result(timeout=timeout)
             # result = self.wrapped_future.wait( timeout=timedelta(timeout) )
@@ -155,8 +155,8 @@ class PrefectPSIJFuture(PrefectWrappedFuture[R, psij.Job]):
         self._final_state = result
     
     def result( self, timeout: Optional[float] = None, raise_on_failure: bool = True ) -> R:
-        with open( tmp_file, 'a' ) as f:
-            f.write( 'result function\n' )
+        # with open( tmp_file, 'a' ) as f:
+        #     f.write( 'result function\n' )
         if not self._final_state:
             try:
                 # future_result = self._wrapped_future.result(timeout=timeout)
@@ -171,8 +171,8 @@ class PrefectPSIJFuture(PrefectWrappedFuture[R, psij.Job]):
             # else:
             #     return future_result
         # Have to 
-        with open( tmp_file, 'a' ) as f:
-            f.write( 'result function finish\n' )
+        # with open( tmp_file, 'a' ) as f:
+        #     f.write( 'result function finish\n' )
         # return self._get_results( self.wrapped_future.work_directory, self.wrapped_future.id )
         return self._get_results( self.wrapped_future.spec.attributes.custom_attributes['tmp_output'] )
         # return self._final_state.result(raise_on_failure=raise_on_failure, _sync=True)
