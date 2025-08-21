@@ -72,7 +72,12 @@ class PrefectPSIJFuture(PrefectWrappedFuture[R, psij.Job]):
             #     self._final_state = future_result
             # else:
             #     return future_result
-        return self._get_results( self.wrapped_future.spec.attributes.custom_attributes['tmp_output'] )
+        #return self._get_results( self.wrapped_future.spec.attributes.custom_attributes['tmp_output'] )
+        output = self._get_results( self.wrapped_future.spec.attributes.custom_attributes['tmp_output'] )
+        if output[1] is not None:
+            raise output[1]
+        return output[0]
+
 
     # This function will receive the output file location, use pickle to deserialize the files, and return the results and error messages in dict(key, value) data type. Keys "results" for results from the job, "errors" for error messages
     # parameters:
@@ -81,7 +86,9 @@ class PrefectPSIJFuture(PrefectWrappedFuture[R, psij.Job]):
     def _get_results( self, output_file_location: Union[str, Path] ):
         with open( output_file_location, 'rb' ) as f:
             output = pickle.load( f )
-        return { 'results': output[0], 'errors': output[1] }
+        #return { 'results': output[0], 'errors': output[1] }
+        # output[0] is results, output[1] is exception
+        return output 
 
 class PSIJTaskRunner(TaskRunner):
 
@@ -91,11 +98,11 @@ class PSIJTaskRunner(TaskRunner):
     # - job_spec, Dict[ str, object ], The job specification parameter can be check at the PSI/J documents
     # - work_directory, [str, Path], Optional, For change the location to write PSI/J files( job submission script, python execution script, data file, output, ... )
     # Return: no return
-    def __init__(self, instance: str, job_spec: Dict[str,object], work_directory: Union[str, Path, None] = None ):
+    def __init__(self, instance: str, job_spec: Dict[str,object], work_directory: Union[str, Path, None] = None, keep_files = False ):
 
         self.instance = instance
         self.job_spec = job_spec
-        self.job_executor = psij_ext.psij_ext(self.instance)
+        self.job_executor = psij_ext.psij_ext(self.instance, keep_files=keep_files)
         if work_directory is not None:
             self.job_executor.work_directory = work_directory
         
